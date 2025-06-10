@@ -1,0 +1,717 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+
+<head>
+    <meta charset="UTF-8">
+    <title>棒球投打對決遊戲</title>
+    <style>
+        :root {
+            --mlb-blue: #002d72;
+            --mlb-red: #c0111f;
+            --mlb-white: #ffffff;
+            --mlb-gray: #f5f7fa;
+        }
+
+        body {
+            font-family: 'Segoe UI', '微軟正黑體', Arial, sans-serif;
+            background: linear-gradient(135deg, var(--mlb-blue) 0%, var(--mlb-red) 100%);
+            text-align: center;
+            margin: 0;
+            padding: 0;
+        }
+
+        #mlb-banner {
+            width: 100vw;
+            background: linear-gradient(90deg, var(--mlb-blue) 0%, var(--mlb-red) 100%);
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            padding: 0.5rem 0 0.5rem 2vw;
+            box-shadow: 0 2px 12px #0002;
+        }
+
+        #mlb-logo {
+            height: 48px;
+            margin-right: 18px;
+        }
+
+        #desc {
+            margin-bottom: 30px;
+            color: var(--mlb-white);
+            font-size: 1.2rem;
+        }
+
+        #cardSelect {
+            display: flex;
+            justify-content: center;
+            gap: 32px;
+            margin: 24px 0 12px 0;
+        }
+
+        .player-card {
+            background: var(--mlb-white);
+            border: 3px solid var(--mlb-blue);
+            border-radius: 16px;
+            box-shadow: 0 4px 16px #002d7233;
+            width: 140px;
+            cursor: pointer;
+            transition: transform 0.2s, border 0.2s, box-shadow 0.2s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 12px 8px 16px 8px;
+            position: relative;
+        }
+
+        .player-card.selected,
+        .player-card:hover {
+            border: 3px solid var(--mlb-red);
+            transform: scale(1.07);
+            box-shadow: 0 8px 32px #c0111f33;
+        }
+
+        .player-card .player-img {
+            width: 90px;
+            height: 120px;
+            border-radius: 10px;
+            object-fit: cover;
+            margin-bottom: 8px;
+            border: 2px solid #eee;
+        }
+
+        .player-card .player-name {
+            font-weight: bold;
+            color: var(--mlb-blue);
+            font-size: 1.1rem;
+            margin-bottom: 4px;
+        }
+
+        .player-card .cleared {
+            position: absolute;
+            top: 6px;
+            right: 8px;
+            color: var(--mlb-red);
+            font-size: 1.3rem;
+            font-weight: bold;
+        }
+
+        #playerInfo {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 30px 0 10px 0;
+            padding: 20px 30px;
+            background: var(--mlb-white);
+            border-radius: 18px;
+            box-shadow: 0 4px 24px 0 rgba(30, 60, 120, 0.12);
+            transition: transform 0.2s;
+        }
+
+        #playerInfo:hover {
+            transform: scale(1.04);
+            box-shadow: 0 8px 32px 0 rgba(30, 60, 120, 0.18);
+        }
+
+        #playerImg {
+            border: 3px solid var(--mlb-blue);
+            margin-right: 28px;
+            border-radius: 12px;
+            box-shadow: 0 2px 12px #b3c6ff;
+            background: var(--mlb-gray);
+            object-fit: cover;
+            transition: box-shadow 0.3s, transform 0.3s;
+        }
+
+        #playerBio {
+            font-size: 1.2rem;
+            color: var(--mlb-blue);
+            text-align: left;
+            min-width: 220px;
+        }
+
+        #strategy {
+            margin: 18px auto 18px auto;
+            color: #222;
+            font-weight: bold;
+            font-size: 1.1rem;
+            background: #fff;
+            border-radius: 10px;
+            padding: 12px 18px;
+            width: 60%;
+            box-shadow: 0 2px 8px #b3c6ff33;
+            border-left: 8px solid var(--mlb-red);
+            position: relative;
+            overflow: hidden;
+
+        }
+
+
+
+        #pitchAnimation {
+            height: 120px;
+            margin: 30px 0 10px 0;
+            position: relative;
+            perspective: 800px;
+        }
+
+        #ball {
+            position: absolute;
+            left: 300px;
+            top: 40px;
+            width: 48px;
+            transform: scale(0.5);
+            /* 放大一點點 */
+            transition: left 0.8s cubic-bezier(.4, 2, .6, 1), filter 0.2s, transform 0.8s cubic-bezier(.4, 2, .6, 1);
+            z-index: 2;
+            box-shadow: 0 8px 24px #8888;
+        }
+
+        #bat {
+            position: absolute;
+            left: 730px;
+            top: 30px;
+            width: 60px;
+            transform: scale(2);
+            /* 放大一點點 */
+            z-index: 1;
+            transition: transform 0.4s cubic-bezier(.4, 2, .6, 1);
+            transform-origin: 10px 40px;
+            filter: drop-shadow(0 2px 8px #8888);
+        }
+
+        select,
+        button {
+            margin: 10px;
+            padding: 10px 18px;
+            font-size: 1rem;
+            border-radius: 8px;
+            border: 1.5px solid var(--mlb-blue);
+            background: var(--mlb-white);
+            transition: box-shadow 0.2s, background 0.2s;
+        }
+
+        select:focus,
+        button:focus {
+            outline: none;
+            box-shadow: 0 0 0 2px var(--mlb-red);
+        }
+
+        button {
+            cursor: pointer;
+            background: linear-gradient(90deg, var(--mlb-blue) 0%, var(--mlb-red) 100%);
+            color: #fff;
+            font-weight: bold;
+            border: none;
+            box-shadow: 0 2px 8px #b3c6ff55;
+            transition: background 0.2s, transform 0.1s;
+        }
+
+        button:active {
+            background: linear-gradient(90deg, var(--mlb-red) 0%, var(--mlb-blue) 100%);
+            transform: scale(0.97);
+        }
+
+        #pitchGrid table {
+            border-collapse: collapse;
+            margin: 0 auto;
+        }
+
+        .zoneBtn {
+            width: 80px;
+            height: 38px;
+            margin: 3px;
+            border-radius: 8px;
+            border: 1.5px solid var(--mlb-blue);
+            background: #e3f2fd;
+            font-size: 0.6rem;
+            transition: background 0.2s, color 0.2s, box-shadow 0.2s, border 0.2s;
+        }
+
+        .zoneBtn.selected,
+        .zoneBtn:active {
+            background: var(--mlb-red);
+            color: #fff;
+            border: 2px solid var(--mlb-blue);
+            box-shadow: 0 2px 8px #ffd70055;
+        }
+
+        #result {
+            margin-top: 30px;
+            font-size: 1.3rem;
+            color: #111;
+            min-height: 48px;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.6s, transform 0.6s;
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px #b3c6ff33;
+            padding: 18px 16px;
+            display: inline-block;
+        }
+
+        #result.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        @media (max-width: 700px) {
+            #cardSelect {
+                flex-direction: column;
+                gap: 12px;
+            }
+
+            #playerInfo {
+                flex-direction: column;
+                padding: 10px;
+            }
+
+            #playerImg {
+                margin-right: 0;
+                margin-bottom: 10px;
+                width: 90vw !important;
+                height: auto !important;
+            }
+
+            #playerBio {
+                min-width: unset;
+            }
+
+            #strategy {
+                width: 95%;
+            }
+        }
+
+        .pitch-options-row {
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            gap: 36px;
+            margin: 30px 0 10px 0;
+            flex-wrap: wrap;
+        }
+
+        .pitch-option {
+            background: #fff;
+            border-radius: 14px;
+            box-shadow: 0 2px 12px #b3c6ff33;
+            padding: 18px 22px;
+            min-width: 220px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            font-size: 1.15rem;
+            transition: box-shadow 0.2s, transform 0.2s;
+        }
+
+        .pitch-option:hover {
+            box-shadow: 0 6px 24px #c0111f33;
+            transform: scale(1.03);
+        }
+
+        .pitch-option label {
+            font-weight: bold;
+            color: var(--mlb-blue);
+            margin-bottom: 10px;
+            font-size: 1.1rem;
+            letter-spacing: 1px;
+        }
+
+        .pitch-option select {
+            font-size: 1rem;
+            padding: 10px 18px;
+            border-radius: 8px;
+            border: 2px solid var(--mlb-blue);
+            margin-bottom: 0;
+            margin-top: 4px;
+            min-width: 100px;
+            background: #e3f2fd;
+            transition: border 0.2s, box-shadow 0.2s;
+        }
+
+        .pitch-option select:focus {
+            border: 2px solid var(--mlb-red);
+            box-shadow: 0 0 0 2px #ffd70055;
+        }
+
+        .zoneBtn {
+            width: 80px;
+            height: 38px;
+            margin: 3px;
+            border-radius: 8px;
+            border: 1.5px solid var(--mlb-blue);
+            color: #111;
+            background: #e3f2fd;
+            font-size: 0.6rem;
+            font-weight: bold;
+            transition: background 0.2s, color 0.2s, box-shadow 0.2s, border 0.2s, transform 0.18s;
+        }
+
+        .zoneBtn.selected,
+        .zoneBtn:active,
+        .zoneBtn:focus {
+            background: linear-gradient(90deg, #fff 60%, var(--mlb-red) 100%);
+            color: var(--mlb-red);
+            border: 2.5px solid var(--mlb-red);
+            box-shadow: 0 4px 24px #c0111f44, 0 0 0 4px #ffd70055;
+            transform: scale(1.08) rotate(-2deg);
+        }
+
+        .zoneBtn:hover:not(.selected) {
+            background: #fffbe7;
+            color: var(--mlb-blue);
+            border: 2.5px solid #ffd700;
+            box-shadow: 0 2px 16px #ffd70033;
+            transform: scale(1.04);
+        }
+
+        @media (max-width: 1100px) {
+            .pitch-options-row {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 18px;
+            }
+
+            .pitch-option {
+                min-width: unset;
+                width: 98%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div id="mlb-banner">
+        <img id="mlb-logo"
+            src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/a6/Major_League_Baseball_logo.svg/800px-Major_League_Baseball_logo.svg.png"
+            alt="MLB Logo" style="height:48px; width:auto; margin-right:18px;">
+        <span style="color: #fff; font-size: 1.5rem; font-weight: bold; letter-spacing: 2px;">MLB 棒球投打對決遊戲</span>
+    </div>
+    <div id="desc">
+        請選擇球員卡牌，擊敗全部球員即可破關！
+    </div>
+
+    <!-- 卡牌選取區 -->
+    <div id="cardSelect"></div>
+
+    <div id="playerInfo">
+        <img id="playerImg" src="https://upload.wikimedia.org/wikipedia/commons/2/25/Sample_User_Icon.png" alt="球員照片"
+            style="width:120px;height:180px;">
+        <div id="playerBio">請選擇球員</div>
+    </div>
+    <div id="strategy"></div>
+    <div id="pitchAnimation">
+        <img id="ball"
+            src="https://static.vecteezy.com/system/resources/previews/013/362/729/non_2x/baseball-ball-transparent-free-png.png">
+        <img id="bat"
+            src="https://images.vexels.com/media/users/3/144811/isolated/lists/2ceb6c22ec10e478538b7781b9984738-baseball-batter-silhouette-player.png">
+    </div>
+
+    <!-- 並排選擇區塊開始 -->
+    <div class="pitch-options-row">
+        <div class="pitch-option">
+            <label for="pitchType">球種：</label>
+            <select id="pitchType">
+                <option value="四縫線速球">四縫線速球(直球)</option>
+                <option value="二縫線直球">二縫線直球(上升速球)</option>
+                <option value="指叉球">指叉球(本壘板快速下墜)</option>
+                <option value="曲球">曲球(外角下墜)</option>
+                <option value="滑球">滑球(進本壘板外角下墜)</option>
+                <option value="變速球">變速球(與直球共軌)</option>
+            </select>
+        </div>
+        <div class="pitch-option">
+            <label>投球位置：</label>
+            <div id="pitchGrid">
+                <table>
+                    <tbody>
+                        <tr>
+                            <td><button class="zoneBtn" data-zone="外角高">外角高</button></td>
+                            <td><button class="zoneBtn" data-zone="中間高">中間高</button></td>
+                            <td><button class="zoneBtn" data-zone="內角高">內角高</button></td>
+                        </tr>
+                        <tr>
+                            <td><button class="zoneBtn" data-zone="外角中">外角中</button></td>
+                            <td><button class="zoneBtn" data-zone="正中央">正中央</button></td>
+                            <td><button class="zoneBtn" data-zone="內角中">內角中</button></td>
+                        </tr>
+                        <tr>
+                            <td><button class="zoneBtn" data-zone="外角低">外角低</button></td>
+                            <td><button class="zoneBtn" data-zone="中間低">中間低</button></td>
+                            <td><button class="zoneBtn" data-zone="內角低">內角低</button></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <input type="hidden" id="pitchZone" value="正中央">
+        </div>
+        <div class="pitch-option">
+            <label for="pitchSpeed">球速：</label>
+            <select id="pitchSpeed">
+                <option value="慢">慢</option>
+                <option value="中">中</option>
+                <option value="快">快</option>
+            </select>
+        </div>
+    </div>
+    <br>
+    <button id="pitchBtn" onclick="sendPitch()">對決！</button>
+
+    <div id="result">
+        <strong>AI 打者反應：</strong><span id="aiResult"></span>
+    </div>
+    <script>
+        const playerData = {
+            "Shohei Ohtani": {
+                img: "https://encrypted-tbn1.gstatic.com/licensed-image?q=tbn:ANd9GcSiAdEkT4wjK6cy2C-t1wH7q1BieI6cTwu18Q1ERykS6wVpOylgmoSBTTrmm8RH4ZJQeh0T10wmH8jyLbqKsJgJeAxLzLMkxShunwryRh05N2tu93-HGdae_NOe3-pRAzlGXpux0VwII0qO",
+                bio: "Shohei Ohtani #日本二刀流球星，Team: Los Angeles Dodgers，Bats: Left Throws: Right，Age: 30，Height: 1.93m。",
+                width: 120,
+                height: 180
+            },
+            "Aaron Judge": {
+                img: "https://encrypted-tbn1.gstatic.com/licensed-image?q=tbn:ANd9GcRbszqx91bNehXosTHxW5yAxHeRpvjsc-FV_O_VSdk-xp5umCezLhyJDqMiVEA9nmyrTeart-r4J5eVdqs",
+                bio: "Aaron Judge #當今美國最強打者，Team: New York Yankees，Bats: Right Throws: Right，Age: 33，Height: 2.01m。",
+                width: 120,
+                height: 180
+            },
+            "Juan Soto": {
+                img: "https://www.washingtonpost.com/wp-apps/imrs.php?src=https://arc-anglerfish-washpost-prod-washpost.s3.amazonaws.com/public/RNAEUSAVERR5ANQAFFMKEFLJYM.jpg&w=1200",
+                bio: "Juan Soto #多明尼加年輕強打，Team: New York Mets，Bats: Left Throws: Left，Age: 26，Height: 1.85m。",
+                width: 120,
+                height: 180
+            }
+        };
+        const playerOrder = ["Shohei Ohtani", "Aaron Judge", "Juan Soto"];
+        let clearedPlayers = [];
+        let currentPlayer = playerOrder[0];
+        // 新增每位打者的好球數
+        let strikeCounts = {
+            "Shohei Ohtani": 0,
+            "Aaron Judge": 0,
+            "Juan Soto": 0
+        };
+        let baseStates = {
+            "Shohei Ohtani": false,
+            "Aaron Judge": false,
+            "Juan Soto": false
+        };
+        let aiWin = false;
+        function renderPlayerCards() {
+            const cardSelect = document.getElementById('cardSelect');
+            cardSelect.innerHTML = '';
+            playerOrder.forEach(name => {
+                const info = playerData[name];
+                const card = document.createElement('div');
+                card.className = 'player-card' + (currentPlayer === name ? ' selected' : '');
+                card.onclick = () => {
+                    if (clearedPlayers.includes(name)) return;
+                    currentPlayer = name;
+                    renderPlayerCards();
+                    updatePlayerInfo();
+                    fetchStrategy();
+                };
+                card.innerHTML = `
+                    <img class="player-img" src="${info.img}" alt="${name}">
+                    <div class="player-name">${name}</div>
+                    ${clearedPlayers.includes(name) ? '<div class="cleared">✔</div>' : ''}
+                `;
+                cardSelect.appendChild(card);
+            });
+        }
+
+        // 顯示好球數
+        function updatePlayerInfo() {
+            const info = playerData[currentPlayer];
+            const img = document.getElementById('playerImg');
+            if (info) {
+                img.src = info.img;
+                img.style.width = info.width + "px";
+                img.style.height = info.height + "px";
+                let baseText = baseStates[currentPlayer] ? `<br><span style="color:#00796b;font-weight:bold;">已上壘</span>` : "";
+                document.getElementById('playerBio').innerHTML =
+                    info.bio.replace(/，/g, '<br>') +
+                    `<br><span style="color:#c0111f;font-weight:bold;">好球數：${strikeCounts[currentPlayer]}</span>` +
+                    baseText;
+            } else {
+                img.src = "https://upload.wikimedia.org/wikipedia/commons/2/25/Sample_User_Icon.png";
+                img.style.width = "120px";
+                img.style.height = "180px";
+                document.getElementById('playerBio').innerText = "請選擇球員";
+            }
+        }
+
+        function fetchStrategy() {
+            document.getElementById('strategy').innerText = "取得建議中...";
+            fetch(`/api/strategy?batter=${encodeURIComponent(currentPlayer)}`)
+                .then(res => res.text())
+                .then(text => {
+                    document.getElementById('strategy').innerText = "AI 攻擊策略建議：\n" + text;
+                })
+                .catch(err => {
+                    document.getElementById('strategy').innerText = '取得失敗：' + err;
+                });
+        }
+
+        // 投球位置按鈕高亮
+        document.querySelectorAll('.zoneBtn').forEach(btn => {
+            btn.addEventListener('click', function () {
+                document.querySelectorAll('.zoneBtn').forEach(b => b.classList.remove('selected'));
+                this.classList.add('selected');
+                document.getElementById('pitchZone').value = this.getAttribute('data-zone');
+            });
+        });
+
+        function sendPitch() {
+            const type = document.getElementById('pitchType').value;
+            const zone = document.getElementById('pitchZone').value;
+            const speed = document.getElementById('pitchSpeed').value;
+
+            document.getElementById('aiResult').innerText = "AI 模擬中，請稍候...";
+            document.getElementById('result').classList.remove('show');
+
+            // 2D動畫
+            const ball = document.getElementById('ball');
+            const bat = document.getElementById('bat');
+            ball.style.left = "0px";
+            ball.style.filter = "none";
+            ball.style.transform = "rotateY(0deg) scale(1)";
+            bat.style.transform = "rotateY(0deg) rotate(0deg) scale(1)";
+
+            setTimeout(() => {
+                ball.style.left = "700px";
+                ball.style.transform = "rotateY(360deg) scale(0.5)";
+                ball.style.filter = "drop-shadow(0 0 24px #ffd700)";
+                setTimeout(() => {
+                    bat.style.transform = "rotateY(-30deg) rotate(-50deg) scale(2)";
+                    ball.style.filter = "drop-shadow(0 0 48px #ff5252)";
+                    ball.style.transform = "rotateY(720deg) scale(1.4)";
+                    setTimeout(() => {
+                        bat.style.transform = "rotateY(0deg) rotate(0deg) scale(2)";
+                        ball.style.left = "0px";
+                        ball.style.filter = "none";
+                        ball.style.transform = "rotateY(0deg) scale(0.5)";
+                    }, 700);
+                }, 800);
+            }, 100);
+
+            // 取得AI回應
+            fetch('/api/pitch', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    pitchType: type,
+                    pitchZone: zone,
+                    pitchSpeed: speed,
+                    batter: currentPlayer
+                })
+            })
+                .then(res => res.text())
+                .then(text => {
+                    document.getElementById('aiResult').innerText = text;
+                    document.getElementById('result').classList.add('show');
+
+                    // 判斷好球情境
+                    let isStrike = false;
+                    // 根據AI回傳內容調整下方判斷關鍵字
+                    if (
+                        (text.includes("好球進壘") && text.includes("未揮棒")) ||
+                        text.includes("揮棒落空") ||
+                        text.includes("好球一顆")
+                    ) {
+                        isStrike = true;
+                    }
+
+                    // 判斷上壘情境
+                    let isOnBase = false;
+                    let baseMatch = text.match(/上到(.+?)壘/);
+                    if (
+                        text.includes("安打") ||
+                        text.includes("保送") ||
+                        text.includes("上壘") ||
+                        (baseMatch && (baseMatch[1].includes("一") || baseMatch[1].includes("二") || baseMatch[1].includes("三") || baseMatch[1].includes("本"))) ||
+                        text.includes("全壘打") || text.includes("本壘打") // 新增判斷全壘打/本壘打
+                    ) {
+                        isOnBase = true;
+                    }
+
+                    // AI獲勝條件：任一打者上壘
+                    if (isOnBase && !baseStates[currentPlayer]) {
+                        baseStates[currentPlayer] = true;
+                        updatePlayerInfo();
+                        aiWin = true;
+                        setTimeout(() => {
+                            alert(`AI打者${currentPlayer}成功上壘，AI獲勝！`);
+                            // 可加上重置遊戲或其他行為
+                        }, 500);
+                        return;
+                    }
+                    // 如果是三振或出局直接過關
+                    if (text.includes("三振") || text.includes("出局")) {
+                        strikeCounts[currentPlayer] = 0;
+                        if (!clearedPlayers.includes(currentPlayer)) {
+                            clearedPlayers.push(currentPlayer);
+                            renderPlayerCards();
+                            const next = playerOrder.find(n => !clearedPlayers.includes(n));
+                            if (next) {
+                                currentPlayer = next;
+                                setTimeout(() => {
+                                    renderPlayerCards();
+                                    updatePlayerInfo();
+                                    fetchStrategy();
+                                    alert(`你擊敗了 ${currentPlayer}！進入下一關！`);
+                                }, 800);
+                            } else {
+                                setTimeout(() => {
+                                    alert("恭喜你擊敗所有球員，破關成功！");
+                                }, 800);
+                            }
+                        }
+                    } else if (isStrike) {
+                        // 累計好球數
+                        strikeCounts[currentPlayer]++;
+                        updatePlayerInfo();
+                        if (strikeCounts[currentPlayer] >= 3) {
+                            // 三振，過關
+                            document.getElementById('aiResult').innerText += "\n三振出局！";
+                            strikeCounts[currentPlayer] = 0;
+                            if (!clearedPlayers.includes(currentPlayer)) {
+                                clearedPlayers.push(currentPlayer);
+                                renderPlayerCards();
+                                const next = playerOrder.find(n => !clearedPlayers.includes(n));
+                                if (next) {
+                                    currentPlayer = next;
+                                    setTimeout(() => {
+                                        renderPlayerCards();
+                                        updatePlayerInfo();
+                                        fetchStrategy();
+                                        alert(`你擊敗了 ${currentPlayer}！進入下一關！`);
+                                    }, 800);
+                                } else {
+                                    setTimeout(() => {
+                                        alert("恭喜你擊敗所有球員，破關成功！");
+                                    }, 800);
+                                }
+                            }
+                        }
+                    } else {
+                        // 其他情況不累計好球數
+                        updatePlayerInfo();
+                    }
+                })
+                .catch(err => {
+                    document.getElementById('aiResult').innerText = '發生錯誤：' + err;
+                    document.getElementById('result').classList.add('show');
+                });
+        }
+
+        // 初始化
+        window.onload = function () {
+            renderPlayerCards();
+            updatePlayerInfo();
+            fetchStrategy();
+            document.querySelector('.zoneBtn[data-zone="正中央"]').classList.add('selected');
+        };
+    </script>
+</body>
+
+</html>
