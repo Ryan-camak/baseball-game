@@ -420,6 +420,9 @@
                 <option value="變速球">變速球(與直球共軌)</option>
             </select>
         </div>
+        <img id="pitchTypeGif"
+            src="https://cdn.shopify.com/s/files/1/0013/5865/9642/files/four_seams_grande.gif?v=1564572206" alt="球種動畫"
+            style="width:240px;height:160px;margin-top:10px;border-radius:8px;box-shadow:0 2px 8px #b3c6ff33;">
         <div class="pitch-option">
             <label>投球位置：</label>
             <div id="pitchGrid">
@@ -481,6 +484,16 @@
                 height: 180
             }
         };
+        // 球種對應GIF網址
+        const pitchTypeGifs = {
+            "四縫線速球": "https://cdn.shopify.com/s/files/1/0013/5865/9642/files/four_seams_grande.gif?v=1564572206", // 請換成你自己的gif
+            "二縫線直球": "https://cdn.shopify.com/s/files/1/0013/5865/9642/files/2-seams_grande.gif?v=1564572432", // 請換成你自己的gif
+            "指叉球": "https://cdn.shopify.com/s/files/1/0013/5865/9642/files/67bbe86fbc3b2a119abc6c6507e56d55_large.gif?v=1566529361", // 請換成你自己的gif
+            "曲球": "https://cdn.shopify.com/s/files/1/0013/5865/9642/files/giphy_8bd73d83-c74e-4e7b-b18a-59f45e6a7781_large.gif?v=1564573283", // 請換成你自己的gif
+            "滑球": "https://cdn.shopify.com/s/files/1/0013/5865/9642/files/slider_3f140caa-0ea4-4b2d-acd0-2674ecf760de_large.gif?v=1566467194", // 請換成你自己的gif
+            "變速球": "https://cdn.shopify.com/s/files/1/0013/5865/9642/files/e4f88a285ee4d6b07e1c182bc447b327_large.gif?v=1566530170" // 請換成你自己的gif
+        };
+
         const playerOrder = ["Shohei Ohtani", "Aaron Judge", "Juan Soto"];
         let clearedPlayers = [];
         let currentPlayer = playerOrder[0];
@@ -703,7 +716,13 @@
                     document.getElementById('result').classList.add('show');
                 });
         }
-
+        document.getElementById('pitchType').addEventListener('change', function () {
+            const type = this.value;
+            const gifUrl = pitchTypeGifs[type] || "https://cdn.shopify.com/s/files/1/0013/5865/9642/files/four_seams_grande.gif?v=1564572206";
+            document.getElementById('pitchTypeGif').src = gifUrl;
+        });
+        // 頁面載入時初始化GIF
+        document.getElementById('pitchTypeGif').src = pitchTypeGifs[document.getElementById('pitchType').value];
         // 初始化
         window.onload = function () {
             renderPlayerCards();
