@@ -446,11 +446,15 @@
         </div>
         <img id="pitchTypeGif"
             src="https://cdn.shopify.com/s/files/1/0013/5865/9642/files/four_seams_grande.gif?v=1564572206" alt="球種動畫"
-            style="width:240px;height:160px;margin-top:10px;border-radius:8px;box-shadow:0 2px 8px #b3c6ff33;">
-        <div class="pitch-option">
+            style="width:480px;height:320px;margin-top:10px;border-radius:8px;box-shadow:0 2px 8px #b3c6ff33;">
+        
+        <img id="pitchTypeDemoGif" 
+            src="https://media.giphy.com/media/3o6Zt8zb1P5G3F0gxi/giphy.gif" alt="球種示意圖"
+            style="width:240px;height:240px;margin-top:10px;border-radius:8px;box-shadow:0 2px 8px #b3c6ff33;">
+        
             <br>
-            <img id="pitchTypeDemoGif" src="https://media.giphy.com/media/3o6Zt8zb1P5G3F0gxi/giphy.gif" alt="球種示意圖"
-                style="width:240px;height:160px;margin-top:10px;border-radius:8px;box-shadow:0 2px 8px #b3c6ff33;">
+        
+        <div class="pitch-option">
             <label>投球位置：</label>
             <div id="pitchGrid">
                 <table>
@@ -523,18 +527,18 @@
         const pitchTypeDemoGifs = {
             "四縫線速球": "https://cdn.shopify.com/s/files/1/0013/5865/9642/files/2_large.gif?v=1566528850",
             "二縫線直球": "https://cdn.shopify.com/s/files/1/0013/5865/9642/files/two-seams_large.gif?v=1566466856",
-            "指叉球": "https://media.giphy.com/media/3o6Zt8zb1P5G3F0gxi/giphy.gif",
-            "曲球": "https://media.giphy.com/media/3o6Zt8zb1P5G3F0gxi/giphy.gif",
-            "滑球": "https://media.giphy.com/media/3o6Zt8zb1P5G3F0gxi/giphy.gif",
-            "變速球": "https://media.giphy.com/media/3o6Zt8zb1P5G3F0gxi/giphy.gif"
+            "指叉球": "https://cdn.shopify.com/s/files/1/0013/5865/9642/files/47862ddd2aa154ffa4da4f6fa80a4e51_large.gif?v=1566529276",
+            "曲球": "https://cdn.shopify.com/s/files/1/0013/5865/9642/files/curve_large.gif?v=1566467486",
+            "滑球": "https://cdn.shopify.com/s/files/1/0013/5865/9642/files/cb1d8d3c0c517e85652e5123f628b9eb_large.gif?v=1566529537",
+            "變速球": "https://cdn.shopify.com/s/files/1/0013/5865/9642/files/359e472753f80b608fb9ab0510777e1e_large.gif?v=1566530092"
         };
 
         const entryGifs = [
             { url: "https://media0.giphy.com/media/v1.Y2lkPTc5MGI3NjExbDNsdW56MWk2MzhuMHJzdnNvcDd1YWJ2bmFmN2swaGRvODVvZjdnNCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/u63cOOBNxwi0BqJZ4K/giphy.gif", duration: 3500 },//shohei_1
-            { url: "https://media0.giphy.com/media/v1.Y2lkPTc5MGI3NjExMWo5c3YydDUxczlqMW81M3E0bTA1d3YxZ2Z2ZzMzOGUwMmlhMWVhdCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/jQst100Uo5iPEjwd1M/giphy.gif", duration: 3600 },//shohei_2
+            { url: "https://media0.giphy.com/media/v1.Y2lkPTc5MGI3NjExMWo5c3YydDUxczlqMW81M3E0bTA1d3YxZ2Z2ZzMzOGUwMmlhMWVhdCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/jQst100Uo5iPEjwd1M/giphy.gif", duration: 3300 },//shohei_2
             { url: "https://media2.giphy.com/media/v1.Y2lkPTc5MGI3NjExaWJjY2JyZGZ6YnhlczJlMnc3NWdjMmxqNHE0Z2FlcmQwYjBzeW53dyZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/dtzjtJG3wwVBPQFsVv/giphy.gif", duration: 1200 },//judge_1
             { url: "https://media2.giphy.com/media/v1.Y2lkPTc5MGI3NjExbWR3ZXY3dGF1cWdsN2cxb2FkeGU4ZjM4aGdpOXZnbGtpcGNqeTY5MSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/Cvuzrqyw149tcgrT9O/giphy.gif", duration: 3600 },//judge_2
-            { url: "https://media4.giphy.com/media/v1.Y2lkPTc5MGI3NjExZ3BuMTI3NWM3YXRpM2N4aWJ6N3JxZXYyeW15cGpka2hnY3c5bG1zbSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/EtQ3Io3fqCNskbRMdq/giphy.gif", duration: 4700 },//soto_1
+            { url: "https://media4.giphy.com/media/v1.Y2lkPTc5MGI3NjExZ3BuMTI3NWM3YXRpM2N4aWJ6N3JxZXYyeW15cGpka2hnY3c5bG1zbSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/EtQ3Io3fqCNskbRMdq/giphy.gif", duration: 4500 },//soto_1
             { url: "https://media1.giphy.com/media/v1.Y2lkPTc5MGI3NjExbTV4Mmc3ZHQwbWt1a3ZmNGZxanRwYWJuZnkyaXgyNm8zcXpmNzczZiZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/3wHnEpOMsn55dJQIbR/giphy.gif", duration: 7000 },//soto_
             // ... 你可以繼續加
         ];
