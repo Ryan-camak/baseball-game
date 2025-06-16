@@ -98,35 +98,50 @@
         #playerInfo {
             display: flex;
             align-items: center;
-            justify-content: center;
-            margin: 30px 0 10px 0;
-            padding: 20px 30px;
-            background: var(--mlb-white);
-            border-radius: 18px;
-            box-shadow: 0 4px 24px 0 rgba(30, 60, 120, 0.12);
-            transition: transform 0.2s;
+            justify-content: flex-start;
+            margin: 30px auto 10px auto;
+            padding: 28px 38px;
+            background: linear-gradient(120deg, #f5f7fa 60%, #e3f2fd 100%);
+            border-radius: 22px;
+            box-shadow: 0 6px 32px 0 rgba(30, 60, 120, 0.18);
+            min-width: 340px;
+            max-width: 520px;
+            position: relative;
+            border: 2.5px solid #b3c6ff;
+            gap: 32px;
+            transition: box-shadow 0.2s, transform 0.2s;
         }
 
         #playerInfo:hover {
-            transform: scale(1.04);
-            box-shadow: 0 8px 32px 0 rgba(30, 60, 120, 0.18);
+            transform: scale(1.03);
+            box-shadow: 0 12px 36px 0 rgba(30, 60, 120, 0.22);
         }
 
         #playerImg {
-            border: 3px solid var(--mlb-blue);
-            margin-right: 28px;
-            border-radius: 12px;
-            box-shadow: 0 2px 12px #b3c6ff;
-            background: var(--mlb-gray);
+            border: 4px solid #1a237e;
+            margin-right: 0;
+            border-radius: 10px;
+            /* 改為矩形圓角 */
+            box-shadow: 0 4px 24px #b3c6ff;
+            background: #e3f2fd;
             object-fit: cover;
+            width: 120px !important;
+            height: 180px !important;
+            /* 恢復原本矩形比例 */
             transition: box-shadow 0.3s, transform 0.3s;
         }
 
         #playerBio {
-            font-size: 1.2rem;
-            color: var(--mlb-blue);
+            font-size: 1.15rem;
+            color: #1a237e;
             text-align: left;
             min-width: 220px;
+            line-height: 1.7;
+            padding-left: 18px;
+            border-left: 3px solid #c0111f;
+            background: rgba(255, 255, 255, 0.7);
+            border-radius: 10px;
+            box-shadow: 0 2px 8px #b3c6ff33;
         }
 
         #strategy {
@@ -263,18 +278,26 @@
 
             #playerInfo {
                 flex-direction: column;
-                padding: 10px;
+                align-items: center;
+                padding: 16px 6vw;
+                min-width: unset;
+                max-width: 98vw;
+                gap: 12px;
             }
 
             #playerImg {
                 margin-right: 0;
                 margin-bottom: 10px;
                 width: 90vw !important;
-                height: auto !important;
+                height: 90vw !important;
+                max-width: 160px !important;
+                max-height: 160px !important;
             }
 
             #playerBio {
-                min-width: unset;
+                padding-left: 0;
+                border-left: none;
+                width: 100%;
             }
 
             #strategy {
@@ -402,9 +425,12 @@
 
 <body>
     <div id="entryOverlay">
-        <img id="entryGif" alt="進場動畫" style="width:960px;height:auto;">
-        <div style="color:#fff;font-size:1.5rem;margin-top:18px;">球員進場中...</div>
+        <img id="coverImg" src="cover.jpg" alt="封面" style="width:1536px;max-width:90vw;border-radius:18px;box-shadow:0 4px 32px #0008;margin-bottom:24px;position:relative;z-index:1;">
+        <img id="entryGif" alt="進場動畫" style="width:864px;height:auto;">
+        <div style="color:#fff;font-size:1.5rem;margin-top:18px;">遊戲準備中...</div>
+        <button id="startBtn" style="margin-top:160px;font-size:1.2rem;position:absolute;left:50%;top:60%;transform:translate(-50%,-50%);z-index:2;">開始遊戲</button>
     </div>
+    <audio id="entryAudio" src="my-entry.mp3"></audio>
     <div id="mlb-banner">
         <img id="mlb-logo"
             src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/a6/Major_League_Baseball_logo.svg/800px-Major_League_Baseball_logo.svg.png"
@@ -447,13 +473,12 @@
         <img id="pitchTypeGif"
             src="https://cdn.shopify.com/s/files/1/0013/5865/9642/files/four_seams_grande.gif?v=1564572206" alt="球種動畫"
             style="width:480px;height:320px;margin-top:10px;border-radius:8px;box-shadow:0 2px 8px #b3c6ff33;">
-        
-        <img id="pitchTypeDemoGif" 
-            src="https://media.giphy.com/media/3o6Zt8zb1P5G3F0gxi/giphy.gif" alt="球種示意圖"
+
+        <img id="pitchTypeDemoGif" src="https://media.giphy.com/media/3o6Zt8zb1P5G3F0gxi/giphy.gif" alt="球種示意圖"
             style="width:240px;height:240px;margin-top:10px;border-radius:8px;box-shadow:0 2px 8px #b3c6ff33;">
-        
-            <br>
-        
+
+        <br>
+
         <div class="pitch-option">
             <label>投球位置：</label>
             <div id="pitchGrid">
@@ -498,19 +523,25 @@
         const playerData = {
             "Shohei Ohtani": {
                 img: "https://encrypted-tbn1.gstatic.com/licensed-image?q=tbn:ANd9GcSiAdEkT4wjK6cy2C-t1wH7q1BieI6cTwu18Q1ERykS6wVpOylgmoSBTTrmm8RH4ZJQeh0T10wmH8jyLbqKsJgJeAxLzLMkxShunwryRh05N2tu93-HGdae_NOe3-pRAzlGXpux0VwII0qO",
-                bio: "Shohei Ohtani #日本二刀流球星，Team: Los Angeles Dodgers，Bats: Left Throws: Right，Age: 30，Height: 1.93m。",
+                bio: "Shohei Ohtani #日本二刀流球星，Bats Left   Throws Right，Age: 30，Height: 1.93m。",
+                team: "Los Angeles Dodgers",
+                teamLogo: "https://a.espncdn.com/guid/fb7cf413-5156-9fc2-abe0-2273b89f70db/logos/primary_logo_on_white_color.png",
                 width: 120,
                 height: 180
             },
             "Aaron Judge": {
                 img: "https://encrypted-tbn1.gstatic.com/licensed-image?q=tbn:ANd9GcRbszqx91bNehXosTHxW5yAxHeRpvjsc-FV_O_VSdk-xp5umCezLhyJDqMiVEA9nmyrTeart-r4J5eVdqs",
-                bio: "Aaron Judge #當今美國最強打者，Team: New York Yankees，Bats: Right Throws: Right，Age: 33，Height: 2.01m。",
+                bio: "Aaron Judge #當今美國最強打者，Bats Right   Throws Right，Age: 33，Height: 2.01m。",
+                team: "New York Yankees",
+                teamLogo: "https://s.yimg.com/cv/apiv2/default/mlb/20190319/500x500/yankees_wbgs.png",
                 width: 120,
                 height: 180
             },
             "Juan Soto": {
                 img: "https://www.washingtonpost.com/wp-apps/imrs.php?src=https://arc-anglerfish-washpost-prod-washpost.s3.amazonaws.com/public/RNAEUSAVERR5ANQAFFMKEFLJYM.jpg&w=1200",
-                bio: "Juan Soto #多明尼加年輕強打，Team: New York Mets，Bats: Left Throws: Left，Age: 26，Height: 1.85m。",
+                bio: "Juan Soto #多明尼加年輕強打，Bats Left   Throws Left，Age: 26，Height: 1.85m。",
+                team: "New York Mets",
+                teamLogo: "https://a.espncdn.com/guid/d08426cc-bf13-5d7b-5217-6d4662019bc6/logos/primary_logo_on_black_color.png",
                 width: 120,
                 height: 180
             }
@@ -534,6 +565,10 @@
         };
 
         const entryGifs = [
+            { url: "https://media0.giphy.com/media/v1.Y2lkPTc5MGI3NjExZXlyd2t5cW1qODk1Z3o5bXFwMzluMDg4ODIzcW01enRubGNwNzUxNCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/hyFIOMryTKGtwvUaSL/giphy.gif", duration: 3700 },
+            { url: "https://media0.giphy.com/media/v1.Y2lkPTc5MGI3NjExazFhdDg4cXN3cm92MmhiM21seHIwMXBvMHZ1YXh5NTZwbGE4NXdqdCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/XI1IrwOzsXVdycDaWO/giphy.gif", duration: 4700 },
+            { url: "https://media3.giphy.com/media/v1.Y2lkPTc5MGI3NjExaHdteHh1b29xdDExdHNrcW5iNTF4Ym9haXRmMmxkYW4waDM3OTI0dyZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/L7xBPnV8PJB1XjiRFo/giphy.gif", duration: 2300 },
+            { url: "https://media2.giphy.com/media/v1.Y2lkPTc5MGI3NjExYXc1cHhwazJleGF3dGhpenM0NnI5Z3JiaGxsc2VyY3IxcGZqc3F2cSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/jC1SPDWbsCb1P8ZuLY/giphy.gif", duration: 5000 },
             { url: "https://media0.giphy.com/media/v1.Y2lkPTc5MGI3NjExbDNsdW56MWk2MzhuMHJzdnNvcDd1YWJ2bmFmN2swaGRvODVvZjdnNCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/u63cOOBNxwi0BqJZ4K/giphy.gif", duration: 3500 },//shohei_1
             { url: "https://media0.giphy.com/media/v1.Y2lkPTc5MGI3NjExMWo5c3YydDUxczlqMW81M3E0bTA1d3YxZ2Z2ZzMzOGUwMmlhMWVhdCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/jQst100Uo5iPEjwd1M/giphy.gif", duration: 3300 },//shohei_2
             { url: "https://media2.giphy.com/media/v1.Y2lkPTc5MGI3NjExaWJjY2JyZGZ6YnhlczJlMnc3NWdjMmxqNHE0Z2FlcmQwYjBzeW53dyZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/dtzjtJG3wwVBPQFsVv/giphy.gif", duration: 1200 },//judge_1
@@ -598,10 +633,19 @@
                 img.style.width = info.width + "px";
                 img.style.height = info.height + "px";
                 let baseText = baseStates[currentPlayer] ? `<br><span style="color:#00796b;font-weight:bold;">已上壘</span>` : "";
+
+                const bioText = info.bio.replace(/，/g, '\n'); // 逗號後換行
                 document.getElementById('playerBio').innerHTML =
-                    info.bio.replace(/，/g, '<br>') +
-                    `<br><span style="color:#c0111f;font-weight:bold;">好球數：${strikeCounts[currentPlayer]}</span>` +
-                    baseText;
+                    `<div style="font-size:1.2rem;font-weight:bold;margin-bottom:6px;display:flex;align-items:center;gap:8px;">
+                        <img src="${info.teamLogo}" style="height:32px;width:auto;vertical-align:middle;margin-right:6px;">
+                        ${info.team}
+                    </div>
+                    <hr style="border:0;border-top:1.5px dashed #b3c6ff;margin:8px 0;">
+                    <div style="font-size:1.05rem;white-space:pre-line;">${bioText}</div>
+                    <div style="margin-top:8px;">
+                        <span style="color:#c0111f;font-weight:bold;">好球數：${strikeCounts[currentPlayer]}</span>
+                        ${baseText}
+                    </div>`;
             } else {
                 img.src = "https://upload.wikimedia.org/wikipedia/commons/2/25/Sample_User_Icon.png";
                 img.style.width = "120px";
@@ -782,7 +826,7 @@
             const gifUrl = pitchTypeGifs[type] || "https://cdn.shopify.com/s/files/1/0013/5865/9642/files/four_seams_grande.gif?v=1564572206";
             document.getElementById('pitchTypeGif').src = gifUrl;
             const demoGifUrl = pitchTypeDemoGifs[type] || "https://media.giphy.com/media/3o6Zt8zb1P5G3F0gxi/giphy.gif";
-    document.getElementById('pitchTypeDemoGif').src = demoGifUrl;
+            document.getElementById('pitchTypeDemoGif').src = demoGifUrl;
         });
         // 頁面載入時初始化GIF
         document.getElementById('pitchTypeGif').src = pitchTypeGifs[document.getElementById('pitchType').value];
@@ -792,28 +836,38 @@
             document.getElementById('playerInfo').style.display = 'none';
             document.getElementById('entryOverlay').style.display = 'flex';
             const entryGif = document.getElementById('entryGif');
+            const entryAudio = document.getElementById('entryAudio');
             let idx = 0;
-            let totalTime = 0;
 
-            function showNextGif() {
-                if (idx >= entryGifs.length) {
-                    document.getElementById('entryOverlay').classList.add('hide');
-                    setTimeout(() => {
-                        document.getElementById('entryOverlay').style.display = 'none';
-                        document.getElementById('playerInfo').style.display = '';
-                    }, 1000);
-                    renderPlayerCards();
-                    updatePlayerInfo();
-                    fetchStrategy();
-                    return;
+            document.getElementById('startBtn').onclick = function () {
+                document.getElementById('coverImg').style.display = 'none'; // 隱藏封面
+                entryAudio.currentTime = 0;
+                entryAudio.play();
+
+                function showNextGif() {
+                    if (idx >= entryGifs.length) {
+                        document.getElementById('entryOverlay').classList.add('hide');
+                        setTimeout(() => {
+                            document.getElementById('entryOverlay').style.display = 'none';
+                            document.getElementById('playerInfo').style.display = '';
+                            entryAudio.pause();
+                        }, 1000);
+                        renderPlayerCards();
+                        updatePlayerInfo();
+                        fetchStrategy();
+                        return;
+                    }
+                    entryGif.onload = function () {
+                        setTimeout(() => {
+                            idx++;
+                            showNextGif();
+                        }, entryGifs[idx].duration);
+                    };
+                    entryGif.src = entryGifs[idx].url;
                 }
-                entryGif.src = entryGifs[idx].url;
-                setTimeout(() => {
-                    idx++;
-                    showNextGif();
-                }, entryGifs[idx].duration);
-            }
-            showNextGif();
+                document.getElementById('startBtn').style.display = 'none';
+                showNextGif();
+            };
         };
     </script>
 </body>
